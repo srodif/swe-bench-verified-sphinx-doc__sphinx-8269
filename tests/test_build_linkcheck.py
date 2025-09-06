@@ -32,7 +32,9 @@ def test_defaults(app, status, warning):
     assert "Not Found for url: https://www.google.com/image2.png" in content
     # looking for local file should fail
     assert "[broken] path/to/notfound" in content
-    assert len(content.splitlines()) == 6
+    # 404 page with anchor should report HTTP error, not "Anchor not found"
+    assert "404" in content and "https://google.com/nonexistent.html#test" in content
+    assert len(content.splitlines()) == 7
 
 
 @pytest.mark.sphinx('linkcheck', testroot='linkcheck', freshenv=True)
@@ -49,8 +51,8 @@ def test_defaults_json(app, status, warning):
                  "info"]:
         assert attr in row
 
-    assert len(content.splitlines()) == 10
-    assert len(rows) == 10
+    assert len(content.splitlines()) == 11
+    assert len(rows) == 11
     # the output order of the rows is not stable
     # due to possible variance in network latency
     rowsby = {row["uri"]:row for row in rows}
@@ -85,6 +87,9 @@ def test_defaults_json(app, status, warning):
     # images should fail
     assert "Not Found for url: https://www.google.com/image.png" in \
         rowsby["https://www.google.com/image.png"]["info"]
+    # 404 page with anchor should report HTTP error, not "Anchor not found"
+    assert "404" in rowsby["https://google.com/nonexistent.html#test"]["info"]
+    assert "Anchor 'test' not found" not in rowsby["https://google.com/nonexistent.html#test"]["info"]
 
 
 @pytest.mark.sphinx(
