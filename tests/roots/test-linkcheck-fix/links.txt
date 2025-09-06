@@ -1,3 +1,0 @@
-This should report 404 error not anchor error
-
-* `404 with anchor <https://httpbin.org/status/404#testanchor>`_
